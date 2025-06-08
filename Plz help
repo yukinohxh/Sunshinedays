@@ -1,0 +1,652 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sunshine Days Fan Social 🌸</title>
+<style>
+  /* Reset + base pixel font */
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0; background: #ffe6f0;
+    font-family: 'Press Start 2P', cursive;
+    color: #9c003d;
+    user-select: none;
+  }
+  header {
+    background: #ff99cc;
+    padding: 10px;
+    text-align: center;
+    font-size: 1.4rem;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 0 10px #ff66aa;
+  }
+  main {
+    max-width: 800px;
+    margin: 10px auto 50px;
+    padding: 0 15px;
+  }
+  button, input[type=text], textarea {
+    font-family: 'Press Start 2P', cursive;
+  }
+  button {
+    background: #ff66aa;
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding: 10px 16px;
+    border-radius: 5px;
+    transition: background 0.3s ease;
+  }
+  button:hover {
+    background: #ff4d88;
+  }
+  .post, .comment {
+    background: #fff0f6;
+    border: 3px solid #ff66aa;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    padding: 10px;
+  }
+  .post-header, .comment-header {
+    font-weight: bold;
+    color: #d1005a;
+    margin-bottom: 6px;
+  }
+  .post-content, .comment-content {
+    margin-bottom: 8px;
+    white-space: pre-wrap;
+  }
+  .post-media img, .post-media video {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+  nav {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  nav button {
+    background: #ff4d88;
+    font-size: 0.7rem;
+  }
+  #profile-section, #feed-section, #characters-section, #error-section, #chat-section {
+    display: none;
+  }
+  #profile-section.active,
+  #feed-section.active,
+  #characters-section.active,
+  #error-section.active,
+  #chat-section.active {
+    display: block;
+  }
+  input[type=text], textarea {
+    width: 100%;
+    padding: 8px;
+    border: 3px solid #ff99cc;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 0.6rem;
+    color: #9c003d;
+    background: #fff0f6;
+  }
+  label {
+    font-size: 0.6rem;
+  }
+  .flex-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .flex-row > * {
+    flex: 1 1 auto;
+  }
+  #banner-preview {
+    width: 100%;
+    max-height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border: 3px solid #ff66aa;
+  }
+  .follow-btn {
+    background: #ff66aa;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    font-size: 0.6rem;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .follow-btn.following {
+    background: #d1005a;
+  }
+  .star-background {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(circle 10px at 10% 15%, #ff66aa, transparent 70%),
+      radial-gradient(circle 7px at 50% 10%, #ff99cc, transparent 80%),
+      radial-gradient(circle 12px at 85% 20%, #ff66aa, transparent 70%),
+      radial-gradient(circle 8px at 20% 80%, #ff99cc, transparent 70%),
+      radial-gradient(circle 9px at 75% 75%, #ff4d88, transparent 70%);
+    background-repeat: repeat;
+    background-size: 150px 150px;
+  }
+  .post-footer {
+    display: flex;
+    gap: 15px;
+    font-size: 0.6rem;
+  }
+  .post-footer button {
+    background: transparent;
+    color: #d1005a;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  .post-footer button.liked {
+    color: #ff1a75;
+  }
+  .comment-list {
+    max-height: 150px;
+    overflow-y: auto;
+    border-top: 1px solid #ff99cc;
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+  /* Popup modal */
+  .modal-bg {
+    position: fixed;
+    inset: 0;
+    background: rgba(220, 50, 100, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+  }
+  .modal {
+    background: #fff0f6;
+    border: 5px solid #ff66aa;
+    border-radius: 20px;
+    max-width: 320px;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #9c003d;
+  }
+  .modal button {
+    margin-top: 12px;
+    font-size: 0.8rem;
+  }
+  /* Profiles list */
+  #users-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 3px solid #ff66aa;
+    border-radius: 10px;
+    padding: 8px;
+  }
+  #users-list div.user-item {
+    padding: 6px 8px;
+    border-bottom: 1px dotted #d1005a;
+    cursor: pointer;
+    color: #d1005a;
+  }
+  #users-list div.user-item:hover {
+    background: #ffd6e8;
+  }
+  /* Character cards */
+  .character-card {
+    border: 3px solid #ff66aa;
+    border-radius: 12px;
+    padding: 10px;
+    margin-bottom: 20px;
+    background: #fff0f6;
+  }
+  .character-card h3 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    color: #d1005a;
+  }
+  .character-card p {
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+  .character-favline {
+    font-style: italic;
+    margin-top: 6px;
+    font-size: 0.55rem;
+    color: #ff1a75;
+  }
+  .character-headcanons {
+    font-size: 0.55rem;
+    margin-top: 8px;
+  }
+  /* Scrollbar for comment & users */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #ff66aa;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #fff0f6;
+  }
+</style>
+</head>
+<body>
+
+<div class="star-background"></div>
+
+<header>
+  Sunshine Days Fan Social 🌸
+</header>
+
+<nav>
+  <button id="nav-feed">Feed</button>
+  <button id="nav-profile">My Profile</button>
+  <button id="nav-characters">Characters</button>
+  <button id="nav-chat">Chat</button>
+  <button id="nav-error">Site Closed</button>
+</nav>
+
+<main>
+
+<!-- Feed Section -->
+<section id="feed-section" class="active">
+  <h2>🌸 Feed</h2>
+  <div id="posts-container"></div>
+  <h3>Create a Post</h3>
+  <textarea id="post-text" rows="3" placeholder="Write something about Sunshine Days..."></textarea>
+  <input type="text" id="post-media" placeholder="Add image/video URL (optional)" />
+  <button id="post-submit">Post</button>
+</section>
+
+<!-- Profile Section -->
+<section id="profile-section">
+  <h2>🌸 My Profile</h2>
+  <label for="profile-pseudo">Pseudo:</label>
+  <input type="text" id="profile-pseudo" maxlength="16" placeholder="Type your cool nickname" />
+  <label for="profile-banner">Banner Image URL:</label>
+  <input type="text" id="profile-banner" placeholder="Paste banner image URL" />
+  <img id="banner-preview" src="" alt="Banner preview" />
+  <button id="save-profile-btn">Save Profile</button>
+
+  <h3>Users (Fake + Real)</h3>
+  <div id="users-list"></div>
+</section>
+
+<!-- Characters Section -->
+<section id="characters-section">
+  <h2>🌸 Characters</h2>
+  <div class="character-card">
+    <h3>Hina</h3>
+    <p>A sweet and shy girl with magical abilities who loves stars and night skies.</p>
+    <p class="character-favline">"The stars shine brighter when you're near."</p>
+    <p class="character-headcanons">Headcanons: Loves ramen, scared of spiders, secretly a great singer.</p>
+  </div>
+  <div class="character-card">
+    <h3>Miyuu</h3>
+    <p>Cool, smart, and a bit mysterious. Expert in technology and hacking.</p>
+    <p class="character-favline">"Nothing escapes my watchful eyes."</p>
+    <p class="character-headcanons">Headcanons: Loves coffee, always has a cat nearby, bad at cooking.</p>
+  </div>
+  <div class="character-card">
+    <h3>Sora</h3>
+    <p>Cheerful and energetic, dreams of flying high above the clouds.</p>
+    <p class="character-favline">"The sky is not the limit, it's just the beginning."</p>
+    <p class="character-headcanons">Headcanons: Afraid of heights (ironic), collects cloud drawings.</p>
+  </div>
+  <div class="character-card">
+    <h3>Momoka</h3>
+    <p>Kind and brave, always standing up for friends with a fiery spirit.</p>
+    <p class="character-favline">"Strength comes from the heart."</p>
+    <p class="character-headcanons">Headcanons: Secretly writes poetry, loves spicy food, bad dancer.</p>
+  </div>
+</section>
+
+<!-- Chat Section -->
+<section id="chat-section">
+  <h2>🌸 Group Chat (Local only)</h2>
+  <div id="chat-messages" style="max-height:300px; overflow-y:auto; border:3px solid #ff66aa; padding:10px; background:#fff0f6; border-radius:12px; margin-bottom:10px;"></div>
+  <input type="text" id="chat-input" placeholder="Type your message..." />
+  <button id="chat-send">Send</button>
+</section>
+
+<!-- Error Section -->
+<section id="error-section">
+  <h2>Site Closed 🚫</h2>
+  <p>Sorry, this site is closed since 2014.<br />Please come back later... or never.</p>
+</section>
+
+</main>
+
+<!-- Language selection modal -->
+<div id="lang-modal" class="modal-bg" style="display:none;">
+  <div class="modal">
+    <h3>Choose your language / Choisis ta langue</h3>
+    <button data-lang="fr">Français 🇫🇷</button>
+    <button data-lang="en">English 🇬🇧</button>
+    <button data-lang="jp">日本語 🇯🇵</button>
+    <button data-lang="es">Español 🇪🇸</button>
+    <button data-lang="ch">中文 🇨🇳</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  // Data and helpers
+  const localUsersKey = 'sd_users';
+  const localProfileKey = 'sd_profile';
+  const localPostsKey = 'sd_posts';
+  const localChatKey = 'sd_chat';
+  const localFollowKey = 'sd_follow';
+
+  // Fake users (basic)
+  const fakeUsers = [
+    {id:'hina', pseudo:'HinaStar', banner:'https://i.imgur.com/sTlt0aI.jpg'},
+    {id:'miyuu', pseudo:'MiyuuTech', banner:'https://i.imgur.com/3qBQl8M.jpg'},
+    {id:'sora', pseudo:'SoraFly', banner:'https://i.imgur.com/UgWZ7Tb.jpg'},
+    {id:'momoka', pseudo:'MomokaFire', banner:'https://i.imgur.com/7kNwCt3.jpg'},
+  ];
+
+  // Initialize profile if not exists
+  let profile = JSON.parse(localStorage.getItem(localProfileKey)) || {pseudo:'', banner:''};
+
+  // Save profile UI
+  const pseudoInput = document.getElementById('profile-pseudo');
+  const bannerInput = document.getElementById('profile-banner');
+  const bannerPreview = document.getElementById('banner-preview');
+  const saveProfileBtn = document.getElementById('save-profile-btn');
+  const usersList = document.getElementById('users-list');
+
+  // Posts container
+  const postsContainer = document.getElementById('posts-container');
+  const postText = document.getElementById('post-text');
+  const postMedia = document.getElementById('post-media');
+  const postSubmit = document.getElementById('post-submit');
+
+  // Chat UI
+  const chatMessages = document.getElementById('chat-messages');
+  const chatInput = document.getElementById('chat-input');
+  const chatSend = document.getElementById('chat-send');
+
+  // Nav buttons and sections
+  const navFeed = document.getElementById('nav-feed');
+  const navProfile = document.getElementById('nav-profile');
+  const navCharacters = document.getElementById('nav-characters');
+  const navChat = document.getElementById('nav-chat');
+  const navError = document.getElementById('nav-error');
+  const sections = {
+    feed: document.getElementById('feed-section'),
+    profile: document.getElementById('profile-section'),
+    characters: document.getElementById('characters-section'),
+    chat: document.getElementById('chat-section'),
+    error: document.getElementById('error-section'),
+  };
+
+  // Language modal
+  const langModal = document.getElementById('lang-modal');
+
+  // Follow list
+  let follows = JSON.parse(localStorage.getItem(localFollowKey)) || [];
+
+  // Posts array
+  let posts = JSON.parse(localStorage.getItem(localPostsKey)) || [];
+
+  // Chat messages array
+  let chatLog = JSON.parse(localStorage.getItem(localChatKey)) || [];
+
+  // LANGUAGES (Basic translations for UI)
+  const translations = {
+    fr: {
+      feed:'Fil d\'actualité',
+      myProfile:'Mon Profil',
+      characters:'Personnages',
+      chat:'Chat',
+      siteClosed:'Site Fermé',
+      createPost:'Créer un post',
+      postPlaceholder:'Écris un truc sur Sunshine Days...',
+      addMedia:'Ajouter URL image/vidéo (optionnel)',
+      saveProfile:'Sauvegarder Profil',
+      users:'Utilisateurs (Fake + Réels)',
+      chatPlaceholder:'Écris ton message...',
+      send:'Envoyer',
+      siteClosedText:'Désolé, ce site est fermé depuis 2014. Reviens plus tard... ou jamais.',
+      welcome:'Bienvenue ! Choisis ta langue',
+    },
+    en: {
+      feed:'Feed',
+      myProfile:'My Profile',
+      characters:'Characters',
+      chat:'Chat',
+      siteClosed:'Site Closed',
+      createPost:'Create a Post',
+      postPlaceholder:'Write something about Sunshine Days...',
+      addMedia:'Add image/video URL (optional)',
+      saveProfile:'Save Profile',
+      users:'Users (Fake + Real)',
+      chatPlaceholder:'Type your message...',
+      send:'Send',
+      siteClosedText:'Sorry, this site is closed since 2014. Please come back later... or never.',
+      welcome:'Welcome! Choose your language',
+    },
+    jp: {
+      feed:'フィード',
+      myProfile:'マイプロフィール',
+      characters:'キャラクター',
+      chat:'チャット',
+      siteClosed:'サイト閉鎖',
+      createPost:'投稿を作成',
+      postPlaceholder:'Sunshine Daysについて書いてください...',
+      addMedia:'画像/動画のURLを追加（オプション）',
+      saveProfile:'プロフィールを保存',
+      users:'ユーザー（偽 + 実際）',
+      chatPlaceholder:'メッセージを入力してください...',
+      send:'送信',
+      siteClosedText:'申し訳ありません、このサイトは2014年から閉鎖されています。後でまた来てください…あるいは決して。',
+      welcome:'ようこそ！言語を選択してください',
+    },
+    es: {
+      feed:'Noticias',
+      myProfile:'Mi Perfil',
+      characters:'Personajes',
+      chat:'Chat',
+      siteClosed:'Sitio Cerrado',
+      createPost:'Crear una publicación',
+      postPlaceholder:'Escribe algo sobre Sunshine Days...',
+      addMedia:'Agregar URL de imagen/video (opcional)',
+      saveProfile:'Guardar Perfil',
+      users:'Usuarios (Falsos + Reales)',
+      chatPlaceholder:'Escribe tu mensaje...',
+      send:'Enviar',
+      siteClosedText:'Lo sentimos, este sitio está cerrado desde 2014. Por favor, vuelve más tarde... o nunca.',
+      welcome:'¡Bienvenido! Elige tu idioma',
+    },
+    ch: {
+      feed:'动态',
+      myProfile:'我的资料',
+      characters:'角色',
+      chat:'聊天',
+      siteClosed:'网站关闭',
+      createPost:'创建帖子',
+      postPlaceholder:'写一些关于Sunshine Days的内容...',
+      addMedia:'添加图片/视频URL（可选）',
+      saveProfile:'保存资料',
+      users:'用户（假 + 真）',
+      chatPlaceholder:'输入你的消息...',
+      send:'发送',
+      siteClosedText:'抱歉，本网站自2014年关闭。请稍后再来……或者永远不要回来。',
+      welcome:'欢迎！请选择你的语言',
+    }
+  };
+
+  let lang = 'fr'; // default
+
+  // Apply translations for main UI texts
+  function applyTranslations() {
+    document.querySelector('header').textContent = 'Sunshine Days Fan Social 🌸';
+    navFeed.textContent = translations[lang].feed;
+    navProfile.textContent = translations[lang].myProfile;
+    navCharacters.textContent = translations[lang].characters;
+    navChat.textContent = translations[lang].chat;
+    navError.textContent = translations[lang].siteClosed;
+    document.querySelector('#feed-section h2').textContent = '🌸 ' + translations[lang].feed;
+    document.querySelector('#feed-section h3').textContent = translations[lang].createPost;
+    postText.placeholder = translations[lang].postPlaceholder;
+    postMedia.placeholder = translations[lang].addMedia;
+    saveProfileBtn.textContent = translations[lang].saveProfile;
+    document.querySelector('#profile-section h2').textContent = '🌸 ' + translations[lang].myProfile;
+    document.querySelector('#profile-section h3').textContent = translations[lang].users;
+    chatInput.placeholder = translations[lang].chatPlaceholder;
+    chatSend.textContent = translations[lang].send;
+    document.querySelector('#chat-section h2').textContent = '🌸 ' + translations[lang].chat;
+    document.querySelector('#error-section h2').textContent = translations[lang].siteClosed + ' 🚫';
+    document.querySelector('#error-section p').innerHTML = translations[lang].siteClosedText.replace(/\n/g,'<br />');
+    document.querySelector('#lang-modal .modal h3').textContent = translations[lang].welcome;
+  }
+
+  // Show language modal if not set before
+  if(!localStorage.getItem('sd_lang')) {
+    langModal.style.display = 'flex';
+  } else {
+    lang = localStorage.getItem('sd_lang');
+    applyTranslations();
+  }
+
+  // Language modal buttons
+  langModal.querySelectorAll('button').forEach(btn => {
+    btn.onclick = () => {
+      lang = btn.getAttribute('data-lang');
+      localStorage.setItem('sd_lang', lang);
+      langModal.style.display = 'none';
+      applyTranslations();
+      renderUsers();
+      renderPosts();
+      renderChat();
+      showSection('feed');
+    };
+  });
+
+  // Show only one section
+  function showSection(name) {
+    for(const key in sections) {
+      sections[key].style.display = (key === name) ? 'block' : 'none';
+    }
+  }
+
+  // Render fake + real users
+  function renderUsers() {
+    usersList.innerHTML = '';
+    // Real user (profile)
+    if(profile.pseudo) {
+      const userDiv = document.createElement('div');
+      userDiv.className = 'user-card';
+      userDiv.innerHTML = `
+        <img src="${profile.banner || 'https://i.imgur.com/7kNwCt3.jpg'}" alt="Banner" style="width:100%; border-radius:12px 12px 0 0;"/>
+        <p><strong>${profile.pseudo}</strong> (You)</p>
+      `;
+      usersList.appendChild(userDiv);
+    }
+    // Fake users
+    fakeUsers.forEach(u => {
+      const userDiv = document.createElement('div');
+      userDiv.className = 'user-card';
+      userDiv.innerHTML = `
+        <img src="${u.banner}" alt="Banner" style="width:100%; border-radius:12px 12px 0 0;"/>
+        <p><strong>${u.pseudo}</strong></p>
+      `;
+      usersList.appendChild(userDiv);
+    });
+  }
+
+  // Save profile handler
+  saveProfileBtn.onclick = () => {
+    const newPseudo = pseudoInput.value.trim();
+    const newBanner = bannerInput.value.trim();
+    if(newPseudo) profile.pseudo = newPseudo;
+    if(newBanner) profile.banner = newBanner;
+    localStorage.setItem(localProfileKey, JSON.stringify(profile));
+    renderUsers();
+    alert('Profile saved!');
+  };
+
+  // Render posts
+  function renderPosts() {
+    postsContainer.innerHTML = '';
+    posts.forEach(post => {
+      const postDiv = document.createElement('div');
+      postDiv.className = 'post';
+      postDiv.innerHTML = `
+        <p>${post.text}</p>
+        ${post.media ? `<img src="${post.media}" alt="Post media" style="max-width:100%; border-radius:12px; margin-top:8px;"/>` : ''}
+      `;
+      postsContainer.appendChild(postDiv);
+    });
+  }
+
+  // Add new post
+  postSubmit.onclick = () => {
+    const text = postText.value.trim();
+    if(!text) return alert('Please write something before posting!');
+    const media = postMedia.value.trim();
+    posts.unshift({text, media});
+    localStorage.setItem(localPostsKey, JSON.stringify(posts));
+    postText.value = '';
+    postMedia.value = '';
+    renderPosts();
+  };
+
+  // Render chat messages
+  function renderChat() {
+    chatMessages.innerHTML = '';
+    chatLog.forEach(msg => {
+      const msgDiv = document.createElement('div');
+      msgDiv.style.marginBottom = '6px';
+      msgDiv.innerHTML = `<strong>${msg.user}</strong>: ${msg.text}`;
+      chatMessages.appendChild(msgDiv);
+    });
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  // Send chat message
+  chatSend.onclick = () => {
+    const text = chatInput.value.trim();
+    if(!text) return;
+    const user = profile.pseudo || 'Guest';
+    chatLog.push({user, text});
+    localStorage.setItem(localChatKey, JSON.stringify(chatLog));
+    chatInput.value = '';
+    renderChat();
+  };
+
+  // Nav button events
+  navFeed.onclick = () => showSection('feed');
+  navProfile.onclick = () => showSection('profile');
+  navCharacters.onclick = () => showSection('characters');
+  navChat.onclick = () => showSection('chat');
+  navError.onclick = () => showSection('error');
+
+  // Initial rendering
+  renderUsers();
+  renderPosts();
+  renderChat();
+  showSection('feed');
+
+})();
+</script>
+
+</body>
+</html>
